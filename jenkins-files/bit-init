@@ -1,0 +1,12 @@
+pipeline {
+  agent {
+    docker { image: 'bitsrc/stable:latest' }
+  }
+  stages {
+    stage('build') {
+      steps {
+        bit -v
+      }
+    }
+  }
+}
