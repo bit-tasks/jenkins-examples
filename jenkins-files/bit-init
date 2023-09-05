@@ -5,7 +5,7 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        bit -v
+        sh bit -v
       }
     }
   }
