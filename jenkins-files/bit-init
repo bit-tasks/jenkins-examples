@@ -1,11 +1,11 @@
 pipeline {
   agent {
-    docker { image: 'bitsrc/stable:latest' }
+    docker { image 'bitsrc/stable:latest' }
   }
   stages {
     stage('build') {
       steps {
-        sh bit -v
+        sh 'bit -v'
       }
     }
   }
