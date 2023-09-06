@@ -1,19 +1,12 @@
 pipeline {
   agent {
-    label 'docker' 
+    docker { image 'bitsrc/stable:latest' }
   }
   stages {
-    stage('Build') {
-      agent {
-        docker {
-          // Set both label and image
-          label 'docker'
-          image 'bitsrc/stable:latest'
-        }
-      }
+    stage('build') {
       steps {
         sh 'bit -v'
       }
     }
   }
-} 
+}
