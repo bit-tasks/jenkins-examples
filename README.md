@@ -70,16 +70,11 @@ You can configure support through the [Bit Docker image](https://github.com/bit-
 
 ## Usage Documentation
 
-The docker images comes with the support for GitHub (`github.bit.<command>` and GitLab (`gitlab.bit.<command>`). If you use a different Git version control system, you can use the Bit commands referring to the [Bit shell script examples](https://github.com/bit-tasks/shell-scripts). 
+You can use the Bit commands referring to the [Bit shell script examples](https://github.com/bit-tasks/shell-scripts) and add additional functionality depending on your Git version control platform (e.g GitHub or GitLab).
 
-let's look at several examples of using Jenkins with GitLab.
+### 1. Bit Initialization
 
-### 1. Bit Initialization: `gitlab.bit.init`
-
-```bash
-gitlab.bit.init
-```
-*Source:* [script details](https://github.com/bit-tasks/bit-docker-image/blob/main/scripts/gitlab.bit.init)
+*Source:* [script details](https://github.com/bit-tasks/shell-scripts/blob/main/scripts/bit-init.sh)
 
 The Bit Docker image comes with the latest Bit version pre-installed. Still, the `gitlab.bit.init` script provides:
 
@@ -97,23 +92,41 @@ pipeline {
   environment {
     GIT_USER_NAME = 'git_user_name'
     GIT_USER_EMAIL = 'git_user_email'
+    BIT_CONFIG_USER_TOKEN = 'bit_user_token'
   }
   stages {
     stage('build') {
       steps {
         sh 'cd my-workspace-dir'
-        sh 'gitlab.bit.init'
+        script {
+          sh '''
+            #!/bin/bash
+            
+            WSDIR="my-workspace-dir" # Specify your workspace directory
+            BIT_VERSION="0.2.8" # Leave empty for the latest version
+            
+            # install bvm and bit
+            npm i -g @teambit/bvm
+            bvm install ${BIT_VERSION} --use-system-node
+            export PATH="${HOME}/bin:${PATH}" # This step may change depending on your CI runner
+            
+            # change to the working directory before running bit install
+            cd ${WSDIR}
+            bit install
+        '''
+        }
       }
     }
   }
 }
 ```
+
 ### 2. Bit Verification: `gitlab.bit.verify`
 
 ```bash
 gitlab.bit.verify
 ```
-*Source:* [script details](https://github.com/bit-tasks/bit-docker-image/blob/main/scripts/gitlab.bit.verify)
+*Source:* [script details](https://github.com/bit-tasks/shell-scripts/blob/main/scripts/bit-verify.sh)
 
 #### Parameters (Optional)
 
@@ -129,215 +142,33 @@ pipeline {
   environment {
     GIT_USER_NAME = 'git_user_name'
     GIT_USER_EMAIL = 'git_user_email'
+    BIT_CONFIG_USER_TOKEN = 'bit_user_token'
   }
   stages {
     stage('build') {
       steps {
         sh 'cd my-workspace-dir'
-        sh 'gitlab.bit.init'
-        sh 'gitlab.bit.verify'
-      }
-    }
-  }
-}
-```
-
-### 3. Bit Commit Bitmap: `gitlab.bit.commit-bitmap`
-
-```bash
-gitlab.bit.commit-bitmap --skip-ci
-```
-*Source:* [script details](https://github.com/bit-tasks/bit-docker-image/blob/main/scripts/gitlab.bit.commit-bitmap)
-
-#### Parameters (Optional)
-
-- `--skip-push`: Avoids pushing changes; useful for tests.
-- `--skip-ci`: Prevents re-triggering CI on code push, avoiding potential loops.
-
-#### Example
-
-```
-pipeline {
-  agent {
-    docker { image 'bitsrc/stable:latest' }
-  }
-  environment {
-    GIT_USER_NAME = 'git_user_name'
-    GIT_USER_EMAIL = 'git_user_email'
-  }
-  stages {
-    stage('build') {
-      steps {
-        sh 'cd my-workspace-dir'
-        sh 'gitlab.bit.init'
-        sh 'gitlab.bit.commit-bitmap --skip-ci'
-      }
-    }
-  }
-}
-```
-
-### 4. Bit Merge Request: `gitlab.bit.merge-request`
-
-```bash
-gitlab.bit.merge-request
-```
-*Source:* [script details](https://github.com/bit-tasks/bit-docker-image/blob/main/scripts/gitlab.bit.merge-request)
-
-Execute this script when a Merge Request is created. It verifies the components and create a lane in [bit.cloud](https://bit.cloud) for previewing and testing components.
-
-#### Example
-
-```
-pipeline {
-  agent {
-    docker { image 'bitsrc/stable:latest' }
-  }
-  environment {
-    GIT_USER_NAME = 'git_user_name'
-    GIT_USER_EMAIL = 'git_user_email'
-  }
-  stages {
-    stage('build') {
-      steps {
-        sh 'cd my-workspace-dir'
-        sh 'gitlab.bit.init'
-        sh 'gitlab.bit.merge-request'
-      }
-    }
-  }
-}
-```
-
-### 5. Bit Lane Cleanup: `gitlab.bit.lane-cleanup`
-
-```bash
-gitlab.bit.lane-cleanup
-```
-*Source:* [script details](https://github.com/bit-tasks/bit-docker-image/blob/main/scripts/gitlab.bit.lane-cleanup)
-
-Execute this script when code is pushed to the main branch. It will detect whether the push is a result of a merge request merge event and will then proceed to clean up the lane.
-
-#### Example
-
-```
-pipeline {
-  agent {
-    docker { image 'bitsrc/stable:latest' }
-  }
-  environment {
-    GIT_USER_NAME = 'git_user_name'
-    GIT_USER_EMAIL = 'git_user_email'
-  }
-  stages {
-    stage('build') {
-      steps {
-        sh 'cd my-workspace-dir'
-        sh 'gitlab.bit.init'
-        sh 'gitlab.bit.lane-cleanup'
-      }
-    }
-  }
-}
-```
-
-### 6. Bit Tag and Export: `gitlab.bit.tag-export`
-
-```bash
-gitlab.bit.tag-export
-```
-*Source:* [script details](https://github.com/bit-tasks/bit-docker-image/blob/main/scripts/gitlab.bit.tag-export)
-
-Tag component versions using labels on Merge Requests or within Merge Request/Commit titles. Use version keywords `major`, `minor`, `patch`, and `pre-release`.
-
-> **Note:** If a Merge Request is merged, track it via its `merge commit` in the target branch. For the action to detect the version keyword, the `merge commit` should be the recent one in the commit history.
-
-#### Example
-
-```
-pipeline {
-  agent {
-    docker { image 'bitsrc/stable:latest' }
-  }
-  environment {
-    GIT_USER_NAME = 'git_user_name'
-    GIT_USER_EMAIL = 'git_user_email'
-  }
-  stages {
-    stage('build') {
-      steps {
-        sh 'cd my-workspace-dir'
-        sh 'gitlab.bit.init'
-        sh 'gitlab.bit.tag-export'
-      }
-    }
-  }
-}
-```
-
-### 7. Bit Branch and Lane: `gitlab.bit.branch-lane`
-
-```bash
-gitlab.bit.branch-lane
-```
-*Source:* [script details](https://github.com/bit-tasks/bit-docker-image/blob/main/scripts/gitlab.bit.branch-lane)
-
-Execute this script when a new branch is created in Git. It will create a lane in [bit.cloud](https://bit.cloud) for each new Branch and keep the lane in sync with the components modified in Git.
-
-#### Example
-
-```
-pipeline {
-  agent {
-    docker { image 'bitsrc/stable:latest' }
-  }
-  environment {
-    GIT_USER_NAME = 'git_user_name'
-    GIT_USER_EMAIL = 'git_user_email'
-  }
-  stages {
-    stage('build') {
-      steps {
-        sh 'cd my-workspace-dir'
-        sh 'gitlab.bit.init'
-        sh 'gitlab.bit.branch-lane'
-      }
-    }
-  }
-}
-```
-
-### 8. Bit Dependency Update: `gitlab.bit.dependency-update`
-
-```bash
-gitlab.bit.dependency-update --allow "envs, workspace-components"
-```
-*Source:* [script details](https://github.com/bit-tasks/bit-docker-image/blob/main/scripts/gitlab.bit.dependency-update)
-
-Run this script as a [scheduled pipeline](https://docs.gitlab.com/ee/ci/pipelines/schedules.html), which will create a merge request to the specified branch with the updated dependencies.
-
-#### Parameters (Optional)
-
-- `--allow`: Allow different types of dependencies. Options `all`, `external-dependencies`, `workspace-components`, `envs`. You can also use a combination of one or two values, e.g. `gitlab.bit.dependency-update --allow "external-dependencies, workspace-components"`. Default `all`.
-- `--branch`: Branch to check for dependency updates. Default `main`.
-
-#### Example
-
-```
-pipeline {
-  agent {
-    docker { image 'bitsrc/stable:latest' }
-  }
-  environment {
-    GIT_USER_NAME = 'git_user_name'
-    GIT_USER_EMAIL = 'git_user_email'
-  }
-  stages {
-    stage('build') {
-      steps {
-        sh 'cd my-workspace-dir'
-        sh 'gitlab.bit.init'
-        sh 'gitlab.bit.dependency-update --allow "all" --branch "main"'
+        script {
+          sh '''
+            #!/bin/bash
+            
+            WSDIR="my-workspace-dir" # Specify your workspace directory
+            BIT_VERSION="0.2.8" # Leave empty for the latest version
+            
+            # install bvm and bit
+            npm i -g @teambit/bvm
+            bvm install ${BIT_VERSION} --use-system-node
+            export PATH="${HOME}/bin:${PATH}" # This step may change depending on your CI runner
+            
+            # change to the working directory before running bit install
+            cd ${WSDIR}
+            bit install
+            
+            # added from bit-verify.sh
+            bit status --strict
+            bit build
+        '''
+        }
       }
     }
   }
