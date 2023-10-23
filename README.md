@@ -121,11 +121,8 @@ pipeline {
 }
 ```
 
-### 2. Bit Verification: `gitlab.bit.verify`
+### 2. Bit Verification
 
-```bash
-gitlab.bit.verify
-```
 *Source:* [script details](https://github.com/bit-tasks/shell-scripts/blob/main/scripts/bit-verify.sh)
 
 #### Parameters (Optional)
