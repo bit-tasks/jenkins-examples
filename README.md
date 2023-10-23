@@ -43,11 +43,11 @@ You can configure support through the [Bit Docker image](https://github.com/bit-
 | Task                        | Example                         | 
 |-----------------------------|---------------------------------|
 | Initialize Bit             | [jenkins-files/bit-init](/jenkins-files/bit-init)           |
-| Bit Verify Components      | [jenkins-files/bit-verify](/jenkins-files/bit-verify)               |
-| Bit Tag and Export         | [jenkins-files/bit-tag-export](/jenkins-files/bit-tag-export)       |
-| Bit Merge Request Build    | [jenkins-files/bit-merge-request](/jenkins-files/bit-merge-request) |
-| Bit Lane Cleanup           | [jenkins-files/bit-lane-cleanup](/jenkins-files/bit-lane-cleanup) |
-| Commit Bitmap              | [jenkins-files/bit-commit-bitmap](/jenkins-files/bit-commit-bitmap) |
+| Bit Verify Components      | [jenkins-files/verify](/jenkins-files/verify)               |
+| Bit Tag and Export         | [jenkins-files/tag-export](/jenkins-files/tag-export)       |
+| Bit Merge Request Build    | [jenkins-files/pull-request](/jenkins-files/pull-request) |
+| Bit Lane Cleanup           | [jenkins-files/lane-cleanup](/jenkins-files/lane-cleanup) |
+| Commit Bitmap              | [jenkins-files/commit-bitmap](/jenkins-files/commit-bitmap) |
 
   :arrow_down: [Download Files](https://github.com/bit-tasks/github-action-examples/raw/main/downloads/automating-component-releases.zip)
 
@@ -55,7 +55,7 @@ You can configure support through the [Bit Docker image](https://github.com/bit-
 
 | Task                        | Example                         |
 |-----------------------------|---------------------------------|
-| Dependency Update           | [jenkins-files/bit-dependency-update](/jenkins-files/bit-dependency-update)   |
+| Dependency Update           | [jenkins-files/bit-dependency-update](/jenkins-files/dependency-update)   |
 
   :arrow_down: [Download Files](https://github.com/bit-tasks/github-action-examples/raw/main/downloads/dependency-update.zip)
 
@@ -63,7 +63,7 @@ You can configure support through the [Bit Docker image](https://github.com/bit-
 
 | Task                        | Example                         |
 |-----------------------------|---------------------------------|
-| Branch Lane                 | [jenkinbs-files/bit-branch-lane](/jenkins-files/bit-branch-lane)  |
+| Branch Lane                 | [jenkinbs-files/bit-branch-lane](/jenkins-files/branch-lane)  |
 
   :arrow_down: [Download Files](https://github.com/bit-tasks/github-action-examples/raw/main/downloads/branch-lane.zip)
 
