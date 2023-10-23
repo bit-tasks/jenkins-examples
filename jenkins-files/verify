@@ -15,8 +15,6 @@ pipeline {
           sh '''
             #!/bin/bash
             
-            # added from bit-init.sh
-
             WSDIR="my-workspace-dir" # Specify your workspace directory
             BIT_VERSION="0.2.8" # Leave empty for the latest version
             
@@ -28,6 +26,11 @@ pipeline {
             # change to the working directory before running bit install
             cd ${WSDIR}
             bit install
+
+            # added from verify.sh
+            
+            bit status --strict
+            bit build
         '''
         }
       }

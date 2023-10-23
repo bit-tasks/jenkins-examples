@@ -28,6 +28,13 @@ pipeline {
             # change to the working directory before running bit install
             cd ${WSDIR}
             bit install
+
+            # added from branch-lane.sh
+
+            bit status --strict
+            bit lane create ${LANE_NAME}
+            bit snap -m "CI" --build
+            bit export
         '''
         }
       }

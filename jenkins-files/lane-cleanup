@@ -28,6 +28,18 @@ pipeline {
             # change to the working directory before running bit install
             cd ${WSDIR}
             bit install
+
+            # added from lane-cleanup.sh
+
+            ORG="my-org" # Specify your workspace org
+            SCOPE="my-scope" # Specify your workspace scope
+            LANE="my-lane" # Specify your lane name
+
+            # try to remove the bit lane
+            bit lane remove ${ORG}.${SCOPE}/${LANE} --remote --silent --force 2> /dev/null
+            if [ $? -ne 0 ]; then
+                echo "Error while removing bit lane. Lane may not exist"
+            fi
         '''
         }
       }
