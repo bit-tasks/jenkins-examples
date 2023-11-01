@@ -3,9 +3,18 @@ Example Jenkin Files for common Bit and Git CI/CD workflows.
 
 ## Setup Guide
 
-1. [Install](https://www.jenkins.io/doc/book/installing/) Jenkins
-2. [Install](https://plugins.jenkins.io/docker-workflow/) Docker Pipeline Plugin.
-3. Follow steps `New Items -> Pipeline -> Pipeline script` and select any of the scripts inside the `jenkins-files` and copy-paste its content.
+1. Jenkins Setup
+   - [Install](https://www.jenkins.io/doc/book/installing/) Jenkins. Example [Setting up Jenkins in AWS Guide](https://www.jenkins.io/doc/tutorials/tutorial-for-installing-jenkins-on-AWS/).
+   - [Install](https://plugins.jenkins.io/docker-workflow/) Docker Pipeline Plugin.
+   - Ensure that your Build Nodes can run docker. Example If you use the Jenkins Host to run build tasks in an Amazon Linux instance, use the following steps.
+     1. **Update the System:** `sudo yum update`
+     2. **Install Docker:** `sudo yum install docker`
+     3. **Start and Enable Docker:** `sudo service docker start sudo chkconfig docker on`
+     4. **Add Jenkins User to Docker Group:** `sudo usermod -aG docker jenkins`
+     5. **Verify Docker Installation:** `docker --version`
+     6. **Restart Jenkins (If on Host):** `sudo service jenkins restart`
+        
+4. Follow steps `New Items -> Pipeline -> Pipeline script` and select any of the scripts inside the `jenkins-files` and copy-paste its content.
 
     Following is an example Jenkins CI/CD pipeline script of checking the Bit version available in the docker container.
 
