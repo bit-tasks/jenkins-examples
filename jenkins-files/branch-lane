@@ -1,6 +1,9 @@
 pipeline {
   agent {
-    docker { image 'bitsrc/stable:latest' }
+    docker {
+      image 'bitsrc/stable:latest'
+      args '-u root --privileged'
+    }
   }
   environment {
     GIT_USER_NAME = 'git_user_name'
@@ -8,35 +11,28 @@ pipeline {
     BIT_CONFIG_USER_TOKEN = 'bit_user_token'
   }
   stages {
-    stage('build') {
+    stage('Build') {
       steps {
-        sh 'cd my-workspace-dir'
         script {
           sh '''
-            #!/bin/bash
-            
             # added from bit-init.sh
-
-            WSDIR="my-workspace-dir" # Specify your workspace directory
-            BIT_VERSION="0.2.8" # Leave empty for the latest version
-            
-            # install bvm and bit
-            npm i -g @teambit/bvm
-            bvm install ${BIT_VERSION} --use-system-node
-            export PATH="${HOME}/bin:${PATH}" # This step may change depending on your CI runner
-            
-            # change to the working directory before running bit install
-            cd ${WSDIR}
+            cd "my-workspace-directory"
             bit install
-
+      
             # added from branch-lane.sh
-
             bit status --strict
             bit lane create ${LANE_NAME}
             bit snap -m "CI" --build
             bit export
-        '''
+          '''
         }
+      }
+    }
+  }
+  post {
+    always {
+      script {
+        cleanWs()
       }
     }
   }

@@ -5,20 +5,31 @@ Example Jenkin Files for common Bit and Git CI/CD workflows.
 
 1. [Install](https://www.jenkins.io/doc/book/installing/) Jenkins
 2. [Install](https://plugins.jenkins.io/docker-workflow/) Docker Pipeline Plugin.
-3. Follow steps `New Items -> Pipeline -> Pipeline script from SCM` and select any of the scripts inside the `jenkins-files` directory of this repository.
+3. Follow steps `New Items -> Pipeline -> Pipeline script` and select any of the scripts inside the `jenkins-files` and copy-paste its content.
 
-    Following is an example Jenkins CI/CD pipeline task file of checking the Bit version available in the docker container.
-  
+    Following is an example Jenkins CI/CD pipeline script of checking the Bit version available in the docker container.
+
     ```
-    # @file jenkins-files/bit-init
     pipeline {
       agent {
-        docker { image 'bitsrc/stable:latest' }
+        docker {
+            image 'bitsrc/stable:latest'
+            args '-u root --privileged'
+        }
+      }
+      environment {
+        GIT_USER_NAME = 'git_user_name'
+        GIT_USER_EMAIL = 'git_user_email'
+        BIT_CONFIG_USER_TOKEN = 'bit_user_token'
       }
       stages {
-        stage('build') {
+        stage('Test Bit Version') {
           steps {
-            sh 'bit -v'
+            script {
+              sh '''
+                bit -v
+              '''
+            }
           }
         }
       }
@@ -76,18 +87,17 @@ You can use the Bit commands referring to the [Bit shell script examples](https:
 
 *Source:* [script details](https://github.com/bit-tasks/shell-scripts/blob/main/scripts/bit-init.sh)
 
-The Bit Docker image comes with the latest Bit version pre-installed. Still, the `gitlab.bit.init` script provides:
-
-- Verification and possible installation of the relevant version as specified in the `engine` block of your `workspace.jsonc`.
-- Initialization of default `org` and `scope` variables for further tasks.
-- Execution of the `bit install` command inside the workspace.
+The Bit Docker image comes with the latest Bit version pre-installed. Therefore, you only need to run `bit install` inside the workspac directory in your script.
 
 #### Example
 
 ```
 pipeline {
   agent {
-    docker { image 'bitsrc/stable:latest' }
+    docker {
+      image 'bitsrc/stable:latest'
+      args '-u root --privileged'
+    }
   }
   environment {
     GIT_USER_NAME = 'git_user_name'
@@ -95,46 +105,54 @@ pipeline {
     BIT_CONFIG_USER_TOKEN = 'bit_user_token'
   }
   stages {
-    stage('build') {
+    stage('Build') {
       steps {
-        sh 'cd my-workspace-dir'
         script {
           sh '''
-            #!/bin/bash
-            
-            WSDIR="my-workspace-dir" # Specify your workspace directory
-            BIT_VERSION="0.2.8" # Leave empty for the latest version
-            
-            # install bvm and bit
-            npm i -g @teambit/bvm
-            bvm install ${BIT_VERSION} --use-system-node
-            export PATH="${HOME}/bin:${PATH}" # This step may change depending on your CI runner
-            
-            # change to the working directory before running bit install
-            cd ${WSDIR}
+            cd "my-workspace-directory"
             bit install
-        '''
+          '''
         }
       }
     }
   }
+  post {
+    always {
+      script {
+        cleanWs()
+      }
+    }
+  }
 }
+```
+
+If you need to install a different version of Bit, you can include the following script.
+
+```sh
+  BIT_VERSION="0.2.8"
+  
+  # install bvm and bit
+  npm i -g @teambit/bvm
+  bvm install ${BIT_VERSION} --use-system-node
+  export PATH="${HOME}/bin:${PATH}" # This step may change depending on your CI runner
+
+  cd "my-workspace-directory"
+  bit install
 ```
 
 ### 2. Bit Verification
 
 *Source:* [script details](https://github.com/bit-tasks/shell-scripts/blob/main/scripts/bit-verify.sh)
 
-#### Parameters (Optional)
-
-- `--skip-build`: This parameter, like `gitlab.bit.verify --skip-build`, prevents the `bit build` command execution.
-
 #### Example
 
 ```
 pipeline {
   agent {
-    docker { image 'bitsrc/stable:latest' }
+    docker {
+      image 'bitsrc/stable:latest'
+      args '-u root --privileged'
+    }
   }
   environment {
     GIT_USER_NAME = 'git_user_name'
@@ -142,35 +160,33 @@ pipeline {
     BIT_CONFIG_USER_TOKEN = 'bit_user_token'
   }
   stages {
-    stage('build') {
+    stage('Build') {
       steps {
-        sh 'cd my-workspace-dir'
         script {
           sh '''
-            #!/bin/bash
-            
-            WSDIR="my-workspace-dir" # Specify your workspace directory
-            BIT_VERSION="0.2.8" # Leave empty for the latest version
-            
-            # install bvm and bit
-            npm i -g @teambit/bvm
-            bvm install ${BIT_VERSION} --use-system-node
-            export PATH="${HOME}/bin:${PATH}" # This step may change depending on your CI runner
-            
-            # change to the working directory before running bit install
-            cd ${WSDIR}
+            # added from bit-init.sh
+            cd "my-workspace-directory"
             bit install
-            
+
             # added from bit-verify.sh
             bit status --strict
             bit build
-        '''
+          '''
         }
+      }
+    }
+  }
+  post {
+    always {
+      script {
+        cleanWs()
       }
     }
   }
 }
 ```
+
+For other Bit and Git CI/CD pipelines tasks refer [Shell Scripts](https://github.com/bit-tasks/shell-scripts).
 
 ## Contributor Guide
 
