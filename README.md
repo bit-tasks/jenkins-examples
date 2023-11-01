@@ -13,8 +13,9 @@ Example Jenkin Files for common Bit and Git CI/CD workflows.
      4. **Add Jenkins User to Docker Group:** `sudo usermod -aG docker jenkins`
      5. **Verify Docker Installation:** `docker --version`
      6. **Restart Jenkins (If on Host):** `sudo service jenkins restart`
+2. Use either `BIT_CLOUD_ACCESS_TOKEN` or `BIT_CONFIG_USER_TOKEN` in your Jenkins pipeline (Not both). For more information, refer [Using an auth token in your CI](https://bit.dev/reference/config/bit-config) section in the documentation.
         
-4. Follow steps `New Items -> Pipeline -> Pipeline script` and select any of the scripts inside the `jenkins-files` and copy-paste its content.
+3. Follow steps `New Items -> Pipeline -> Pipeline script` and select any of the scripts inside the `jenkins-files` and copy-paste its content.
 
     Following is an example Jenkins CI/CD pipeline script of checking the Bit version available in the docker container.
 
