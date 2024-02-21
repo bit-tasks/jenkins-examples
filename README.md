@@ -13,7 +13,7 @@ Example Jenkin Files for common Bit and Git CI/CD workflows.
      4. **Add Jenkins User to Docker Group:** `sudo usermod -aG docker jenkins`
      5. **Verify Docker Installation:** `docker --version`
      6. **Restart Jenkins (If on Host):** `sudo service jenkins restart`
-2. Use BIT_CLOUD_ACCESS_TOKEN ([docs](https://bit.dev/reference/ci/jenkins#generating-an-access-token)).
+2. Use BIT_CONFIG_ACCESS_TOKEN ([docs](https://bit.dev/reference/ci/jenkins#generating-an-access-token)).
         
 3. Follow steps `New Items -> Pipeline -> Pipeline script` and select any of the scripts inside the `jenkins-files` and copy-paste its content.
 
@@ -30,7 +30,7 @@ Example Jenkin Files for common Bit and Git CI/CD workflows.
       environment {
         GIT_USER_NAME = 'git_user_name'
         GIT_USER_EMAIL = 'git_user_email'
-        BIT_CLOUD_ACCESS_TOKEN = 'bit_cloud_access_token'
+        BIT_CONFIG_ACCESS_TOKEN = 'bit_config_access_token'
       }
       stages {
         stage('Test Bit Version') {
@@ -112,7 +112,7 @@ pipeline {
   environment {
     GIT_USER_NAME = 'git_user_name'
     GIT_USER_EMAIL = 'git_user_email'
-    BIT_CLOUD_ACCESS_TOKEN = 'bit_cloud_access_token'
+    BIT_CONFIG_ACCESS_TOKEN = 'bit_config_access_token'
   }
   stages {
     stage('Build') {
@@ -167,7 +167,7 @@ pipeline {
   environment {
     GIT_USER_NAME = 'git_user_name'
     GIT_USER_EMAIL = 'git_user_email'
-    BIT_CLOUD_ACCESS_TOKEN = 'bit_cloud_access_token'
+    BIT_CONFIG_ACCESS_TOKEN = 'bit_config_access_token'
   }
   stages {
     stage('Build') {
