@@ -198,6 +198,55 @@ pipeline {
 
 For other Bit and Git CI/CD pipelines tasks refer [Shell Scripts](https://github.com/bit-tasks/shell-scripts).
 
+## Setup PNPM Caching
+You can speed up the CI builds by caching the `pnpm store` by mounting it from the Jenkins host.
+
+```
+pipeline {
+  agent {
+    docker {
+      image 'bitsrc/stable:latest'
+      args '-u root --privileged -v /jenkins/caches/my-workspace-directory/.pnpm-store:/my-workspace-directory/.pnpm-store'
+    }
+  }
+  environment {
+    GIT_USER_NAME = 'git_user_name'
+    GIT_USER_EMAIL = 'git_user_email'
+    BIT_CONFIG_ACCESS_TOKEN = 'bit_config_access_token'
+    PNPM_STORE = '/my-workspace-directory/.pnpm-store' // Define the environment variable for the pnpm store path
+  }
+  stages {
+    stage('Build') {
+      steps {
+        script {
+          sh '''
+            # Configure pnpm to use the mounted cache directory
+            pnpm config set store-dir $PNPM_STORE
+
+            # Proceed with bit and pnpm commands
+            cd "my-workspace-directory"
+            bit install
+
+            # Verify and build operations
+            bit status --strict
+            bit build
+          '''
+        }
+      }
+    }
+  }
+  post {
+    always {
+      script {
+        cleanWs(notFailBuild: true)
+      }
+    }
+  }
+}
+```
+
+**Note:** The exact volume path that you mount may depend on your Jenkins host configuration.
+
 ## Contributor Guide
 
 To contribute, make updates to scripts starting with `gitlab.bit.` in the [Bit Docker Image Repository](https://github.com/bit-tasks/bit-docker-image).
