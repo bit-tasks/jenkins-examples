@@ -22,7 +22,7 @@ pipeline {
             # added from commit-bitmap.sh
             git config --global user.name "${GIT_USER_NAME}"
             git config --global user.email "${GIT_USER_EMAIL}"
-            git add .bitmap
+            git add .bitmap pnpm-lock.yaml
 
             # try to commit the changes
             git commit -m "update .bitmap with new component versions (automated). [skip-ci]" &> /dev/null
