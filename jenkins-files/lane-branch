@@ -1,0 +1,56 @@
+pipeline {
+  agent {
+    docker {
+      image 'bitsrc/stable:latest'
+      args '-u root --privileged'
+    }
+  }
+  parameters {
+    string(name: 'LANE_NAME', description: 'Name of the Bit lane')
+    string(name: 'BRANCH_NAME', description: 'Name of the Git branch')
+  }
+  environment {
+    GIT_USER_NAME = 'git_user_name'
+    GIT_USER_EMAIL = 'git_user_email'
+    BIT_CONFIG_ACCESS_TOKEN = 'bit_config_access_token'
+  }
+  stages {
+    stage('Build') {
+      steps {
+        script {
+          sh '''
+            # added from bit-init.sh
+            cd "my-workspace-directory"
+            bit install
+      
+            # added from lane-branch.sh
+            bit import -x
+            bit lane import "${LANE_NAME}"
+            bit init --reset-lane-new
+
+            # Set git configuration
+            git config --global user.name "${GIT_USER_NAME}"
+            git config --global user.email "${GIT_USER_EMAIL}"
+
+            # Git operations
+            git checkout -b "${BRANCH_NAME}"
+            git add .
+            git commit -m "Committing the latest updates from lane: ${LANE_NAME} to the Git branch (automated) [skip-ci]" 2> /dev/null
+            if [ $? -ne 0 ]; then
+                echo "Error while committing changes"
+            fi
+
+            git push origin "${BRANCH_NAME}" -f
+          '''
+        }
+      }
+    }
+  }
+  post {
+    always {
+      script {
+        cleanWs()
+      }
+    }
+  }
+}

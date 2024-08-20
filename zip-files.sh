@@ -13,5 +13,8 @@ zip -j downloads/automating-component-releases.zip \
     jenkins-files/verify
 
 # Zip other individual files
-zip -j downloads/branch-lane.zip jenkins-files/branch-lane
+zip -j downloads/branch-lane.zip \
+    jenkins-files/branch-lane \
+    jenkins-files/lane-branch
+    
 zip -j downloads/dependency-update.zip jenkins-files/dependency-update
