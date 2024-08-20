@@ -85,6 +85,7 @@ You can configure support through the [Bit Docker image](https://github.com/bit-
 | Task                        | Example                         |
 |-----------------------------|---------------------------------|
 | Branch Lane                 | [jenkinbs-files/bit-branch-lane](/jenkins-files/branch-lane)  |
+| Lane Branch                 | [jenkinbs-files/bit-lane-branch](/jenkins-files/lane-branch)  |
 
   :arrow_down: [Download Files](https://github.com/bit-tasks/github-action-examples/raw/main/downloads/branch-lane.zip)
 
