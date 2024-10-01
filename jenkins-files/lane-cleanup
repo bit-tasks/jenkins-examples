@@ -18,17 +18,27 @@ pipeline {
             # added from bit-init.sh
             cd "my-workspace-directory"
             bit install
-      
+
             # added from lane-cleanup.sh
+
             ORG="my-org" # Specify your workspace org
             SCOPE="my-scope" # Specify your workspace scope
             LANE="my-lane" # Specify your lane name
+            BIT_TOKEN=${BIT_CONFIG_ACCESS_TOKEN}
+            
+            # Choose one of the following options
 
-            # try to remove the bit lane
-            bit lane remove ${ORG}.${SCOPE}/${LANE} --remote --silent --force &> /dev/null
-            if [ /$? -ne 0 ]; then
+            # Option 1: Hard Delete
+            bit lane remove "${ORG}.${SCOPE}/${LANE}" --remote --silent --force 2> /dev/null
+            if [ $? -ne 0 ]; then
                 echo "Error while removing bit lane. Lane may not exist"
             fi
+
+            # Option 2: Soft Delete
+            curl -X POST "https://api.v2.bit.cloud/graphql" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $BIT_TOKEN" \
+            -d '{"query": "mutation DELETE_LANE($id: String!) { deleteLane(id: $id) }", "variables": {"id": "'"${ORG}.${SCOPE}/${LANE}"'"}}'
           '''
         }
       }
